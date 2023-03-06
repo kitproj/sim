@@ -13,12 +13,12 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/dop251/goja"
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/routers"
 	"github.com/getkin/kin-openapi/routers/gorillamux"
 	"github.com/google/uuid"
-
-	"github.com/dop251/goja"
-	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/kitproj/sim/internal/db"
 )
 
 func main() {
@@ -140,7 +140,7 @@ func startServer(port int, specs []*openapi3.T) {
 					http.Error(w, fmt.Sprintf("failed to set randomUUID: %v", err), http.StatusInternalServerError)
 					return
 				}
-				if err := vm.Set("db", db); err != nil {
+				if err := vm.Set("db", db.Instance); err != nil {
 					http.Error(w, fmt.Sprintf("failed to set db: %v", err), http.StatusInternalServerError)
 					return
 				}

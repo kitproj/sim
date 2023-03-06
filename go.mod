@@ -1,4 +1,4 @@
-module github.com/kitproj/sim/sim
+module github.com/kitproj/sim
 
 go 1.20
 

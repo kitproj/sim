@@ -1,4 +1,4 @@
-package main
+package db
 
 // Db is a key-value store
 type Db interface {
@@ -8,4 +8,4 @@ type Db interface {
 	List(prefix string) []any
 }
 
-var db Db = diskDb("db")
+var Instance Db = diskDb("db")
