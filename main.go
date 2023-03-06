@@ -51,6 +51,13 @@ func main() {
 					return err
 				}
 				servers[port] = append(servers[port], spec)
+
+				for path, item := range spec.Paths {
+					for method := range item.Operations() {
+						log.Printf("%s %s%s", method, server.URL, path)
+					}
+				}
+
 			}
 		}
 		return nil
@@ -68,7 +75,7 @@ func main() {
 
 func startServer(port int, specs []*openapi3.T) {
 	server := &http.Server{
-		Addr: fmt.Sprintf("localhost:%d", port),
+		Addr: fmt.Sprintf(":%d", port),
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Request: %s %s", r.Method, r.URL.Path)
 			var op *openapi3.Operation
@@ -155,7 +162,7 @@ func startServer(port int, specs []*openapi3.T) {
 	}
 
 	go func() {
-		log.Printf("Serving on http://%s\n", server.Addr)
+		log.Printf("Serving on %s\n", server.Addr)
 		if err := server.ListenAndServe(); err != nil {
 			log.Printf("error serving simulated API: %v", err)
 		}
