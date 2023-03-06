@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  title: Teapot API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4040
+paths:
+  /teapot:
+    get:
+      x-sim-script: |
+       response = {
+          "status": 418,
+          "headers": {
+            "Teapot": "true"
+          },
+          "body": { "message": "I'm a teapot" }
+        }
+      responses:
+        '200':
+          description: OK

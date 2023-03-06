@@ -1,13 +1,12 @@
 openapi: 3.0.0
 info:
-  title: Minimal OpenAPI Spec
+  title: Hello API
   version: 1.0.0
 servers:
   - url: http://localhost:8080
 paths:
   /hello:
     get:
-      operationId: sayHello
       responses:
         '200':
           description: OK
