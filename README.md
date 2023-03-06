@@ -45,6 +45,15 @@ We do not support `go install`.
 
 ## Usage
 
+Create a directory containing files named `openapi.yaml`. 
+
+Then run:
+
+```bash
+sim my-directory
+
+```
+
 Simulations are described by their API specification. For simple mocking, specify your examples in the OpenAPI spec:
 
 ```yaml
@@ -65,11 +74,38 @@ paths:
               example: { "message": "Hello, world!" }
 ```
 
+Or complex scripting
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Teapot API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4040
+paths:
+  /teapot:
+    get:
+      x-sim-script: |
+        response = {
+           "status": 418,
+           "headers": {
+             "Teapot": request.queryParams.teapot
+           },
+           "body": { "message": "I'm a " + db.get("/teapot/name") }
+         }
+      responses:
+        '200':
+          description: OK
+```
+
+## Reference
+
 In you script you have access to the following:
 
 **`request`**
 
-The request, e.g. 
+The request, e.g.
 
 ```json
 {
@@ -105,33 +141,4 @@ db.put(key, object);
 db.delete(key)
 // return an array of all objects
 db.list(keyPrefix);
-```
-
-Then run:
-
-```bash
-sim api-specs
-```
-
-```yaml
-openapi: 3.0.0
-info:
-  title: Teapot API
-  version: 1.0.0
-servers:
-  - url: http://localhost:4040
-paths:
-  /teapot:
-    get:
-      x-sim-script: |
-        response = {
-           "status": 418,
-           "headers": {
-             "Teapot": "true"
-           },
-           "body": { "message": "I'm a teapot" }
-         }
-      responses:
-        '200':
-          description: OK
 ```

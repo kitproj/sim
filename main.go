@@ -61,7 +61,6 @@ func main() {
 						log.Printf("%s %s%s", method, server.URL, path)
 					}
 				}
-
 			}
 		}
 		return nil
