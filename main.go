@@ -34,11 +34,13 @@ func main() {
 	// Find OpenAPI spec files in directory
 	servers := map[int][]*openapi3.T{}
 
+	log.Printf("Loading OpenAPI specs from %s\n", specsDir)
+
 	err := filepath.Walk(specsDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		if !info.IsDir() && filepath.Base(path) == "openapi.yaml" {
+		if !info.IsDir() && filepath.Ext(path) == ".yaml" {
 			log.Printf("Loading OpenAPI spec from %s\n", path)
 			spec, err := openapi3.NewLoader().LoadFromFile(path)
 			if err != nil {
@@ -72,6 +74,8 @@ func main() {
 	for port, specs := range servers {
 		startServer(port, specs)
 	}
+
+	log.Println("Press Ctrl+C to exit")
 
 	<-ctx.Done()
 }
