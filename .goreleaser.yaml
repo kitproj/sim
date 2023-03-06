@@ -32,7 +32,7 @@ changelog:
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 brews:
-  - homepage: "https://github.com/kitproj/kit"
+  - homepage: "https://github.com/kitproj/sim"
     description: "Straight-forward, fast, scalable API simulation."
     folder: Formula
     commit_author:
