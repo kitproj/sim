@@ -5,6 +5,8 @@ import (
 	"strconv"
 )
 
+type Request map[string]any
+
 type Response map[string]any
 
 func (r Response) GetStatus() int {
@@ -23,7 +25,11 @@ func (r Response) GetStatus() int {
 
 func (r Response) GetHeaders() map[string]string {
 	out := map[string]string{}
-	for k, v := range r["headers"].(map[string]any) {
+	headers, ok := r["headers"].(map[string]any)
+	if !ok {
+		return nil
+	}
+	for k, v := range headers {
 		out[k] = fmt.Sprint(v)
 	}
 	return out

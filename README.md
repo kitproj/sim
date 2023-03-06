@@ -25,7 +25,7 @@ Sim was written with extensive help from AI.
 
 ## Install
 
-Like `jq`, `sim` is a tiny (8Mb) standalone binary. You can download it from
+Like `jq`, `sim` is a tiny (16Mb) standalone binary. You can download it from
 the [releases page](https://github.com/kitproj/sim/releases/latest).
 
 If you're on MacOS, you can use `brew`:
@@ -63,6 +63,48 @@ paths:
           content:
             application/json:
               example: { "message": "Hello, world!" }
+```
+
+In you script you have access to the following:
+
+**`request`**
+
+The request, e.g. 
+
+```json
+{
+  "method": "PUT",
+  "path": "/documents/bar",
+  "pathParams": {
+    "id": "bar"
+  },
+  "queryParams": {
+    "foo": "bar"
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "baz": "qux"
+  }
+}
+```
+
+**`randomUuid()`**
+
+Generates a random UUID.
+
+**`db`** allows you to persist and access data:
+
+```javascript
+// get an object, maybe null
+db.get(key);
+// put an object
+db.put(key, object);
+// delete an object
+db.delete(key)
+// return an array of all objects
+db.list(keyPrefix);
 ```
 
 Then run:

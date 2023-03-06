@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/dop251/goja v0.0.0-20230304130813-e2f543bf4b4c
 	github.com/getkin/kin-openapi v0.114.0
+	github.com/google/uuid v1.3.0
 )
 
 require (
@@ -13,6 +14,7 @@ require (
 	github.com/go-openapi/swag v0.19.5 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

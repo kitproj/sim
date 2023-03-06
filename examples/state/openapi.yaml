@@ -1,0 +1,59 @@
+openapi: 3.0.0
+info:
+  title: Document API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4040
+paths:
+  /documents:
+    put:
+      x-sim-script: |
+        var uuid = randomUUID();
+        db.put("/documents/" + uuid, request.body)
+        response = {
+          "status": 201,
+            "headers": {
+                "Location": "/documents/" + uuid
+            }
+        }
+      responses:
+        '200':
+          description: OK
+    get:
+      x-sim-script: |
+        response = {
+          "body": db.list("/documents")
+        }
+      responses:
+        '200':
+          description: OK
+  /documents/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-sim-script: |
+        response = {
+          "body": db.get("/documents/" + request.pathParams.id)
+        }
+      responses:
+        '200':
+          description: OK
+
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-sim-script: |
+        db.delete("/documents/" + request.pathParams.id)
+        response = {
+        }
+      responses:
+        '204':
+          description: OK

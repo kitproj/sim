@@ -13,6 +13,10 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/getkin/kin-openapi/routers"
+	"github.com/getkin/kin-openapi/routers/gorillamux"
+	"github.com/google/uuid"
+
 	"github.com/dop251/goja"
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -79,9 +83,19 @@ func startServer(port int, specs []*openapi3.T) {
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Request: %s %s", r.Method, r.URL.Path)
 			var op *openapi3.Operation
+			var pathParams map[string]string
 			for _, s := range specs {
-				if path := s.Paths.Find(r.URL.Path); path != nil {
-					op = path.GetOperation(r.Method)
+				router, err := gorillamux.NewRouter(s)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("failed to create router: %v", err), http.StatusInternalServerError)
+					return
+				}
+				var route *routers.Route
+				route, pathParams, err = router.FindRoute(r)
+				if err == nil {
+					log.Printf("Found route: %v", route)
+					op = route.Operation
+					break
 				}
 			}
 			if op == nil {
@@ -91,9 +105,10 @@ func startServer(port int, specs []*openapi3.T) {
 			expr, ok := op.Extensions["x-sim-script"]
 			if ok {
 				log.Printf("Found x-sim-script: %v", expr)
-				query := map[string]string{}
+
+				queryParams := map[string]string{}
 				for key := range r.URL.Query() {
-					query[key] = r.URL.Query().Get(key)
+					queryParams[key] = r.URL.Query().Get(key)
 				}
 				headers := map[string]string{}
 				for key := range r.Header {
@@ -101,18 +116,33 @@ func startServer(port int, specs []*openapi3.T) {
 				}
 				body := map[string]any{}
 				_ = json.NewDecoder(r.Body).Decode(&body)
+				request := map[string]any{
+					"method":      r.Method,
+					"path":        r.URL.Path,
+					"queryParams": queryParams,
+					"pathParams":  pathParams,
+					"headers":     headers,
+					"body":        body,
+				}
 				vm := goja.New()
 				vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
-				if err := vm.Set("query", query); err != nil {
-					http.Error(w, fmt.Sprintf("failed to set query: %v", err), http.StatusInternalServerError)
+				if err := vm.Set("request", request); err != nil {
+					http.Error(w, fmt.Sprintf("failed to set request: %v", err), http.StatusInternalServerError)
 					return
 				}
-				if err := vm.Set("headers", headers); err != nil {
-					http.Error(w, fmt.Sprintf("failed to set headers: %v", err), http.StatusInternalServerError)
+				var randomUUID = func() string {
+					random, err := uuid.NewRandom()
+					if err != nil {
+						panic(err)
+					}
+					return random.String()
+				}
+				if err := vm.Set("randomUUID", randomUUID); err != nil {
+					http.Error(w, fmt.Sprintf("failed to set randomUUID: %v", err), http.StatusInternalServerError)
 					return
 				}
-				if err := vm.Set("body", body); err != nil {
-					http.Error(w, fmt.Sprintf("failed to set body: %v", err), http.StatusInternalServerError)
+				if err := vm.Set("db", db); err != nil {
+					http.Error(w, fmt.Sprintf("failed to set db: %v", err), http.StatusInternalServerError)
 					return
 				}
 				out, err := vm.RunString(expr.(string))
@@ -135,6 +165,7 @@ func startServer(port int, specs []*openapi3.T) {
 				w.WriteHeader(response.GetStatus())
 
 				switch body := response.GetBody().(type) {
+				case nil:
 				case string:
 					_, err = w.Write([]byte(body))
 				case []byte:
