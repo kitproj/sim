@@ -1,5 +1,10 @@
 package db
 
+import (
+	"os"
+	"path/filepath"
+)
+
 // Db is a key-value store
 type Db interface {
 	Get(key string) any
@@ -8,4 +13,4 @@ type Db interface {
 	List(prefix string) []any
 }
 
-var Instance Db = diskDb("db")
+var Instance Db = diskDb(filepath.Join(os.Getenv("HOME"), ".kitproj", "sim", "db"))
