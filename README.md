@@ -43,6 +43,12 @@ curl -q https://raw.githubusercontent.com/kitproj/sim/main/install.sh | sh
 
 We do not support `go install`.
 
+You can run a Docker image:
+
+```bash
+docker run --rm -ti -v my-directory:/apis kitproj/sim /sim /apis
+```
+
 ## Usage
 
 Create a directory containing files named `openapi.yaml`. 

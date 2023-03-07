@@ -1,0 +1,14 @@
+/.git
+/.github
+/.idea
+/examples
+/Formula
+/.goreleaser.yaml
+/Dockerfile
+/install.sh
+/LICENSE
+/pre-commit
+/README.md
+/release
+/sim
+/sim.iml
