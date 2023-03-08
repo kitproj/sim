@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type Request map[string]any
@@ -10,12 +9,9 @@ type Request map[string]any
 type Response map[string]any
 
 func (r Response) GetStatus() int {
-	text, ok := r["status"].(string)
+	v, ok := r["status"].(int64)
 	if ok {
-		status, _ := strconv.Atoi(text)
-		if status > 0 {
-			return status
-		}
+		return int(v)
 	}
 	if r.GetBody() != nil {
 		return 200

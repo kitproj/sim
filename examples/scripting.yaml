@@ -4,12 +4,18 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:4040
+# This script is executed when the spec is loaded.
+# You can use it to specify global variables and functions that are available to all scripts.
+x-sim-script: |
+  var status = 418
 paths:
   /teapot:
     get:
+      # This script is executed whenever the request is serviced.
+      # The last variable is the response object.
       x-sim-script: |
        response = {
-          "status": 418,
+          "status": status,
           "headers": {
             "Teapot": "true"
           },

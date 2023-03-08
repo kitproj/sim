@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strconv"
+	"sync"
 	"syscall"
 
 	"github.com/dop251/goja"
@@ -33,6 +34,7 @@ func main() {
 
 	// Find OpenAPI spec files in directory
 	servers := map[int][]*openapi3.T{}
+	vms := map[*openapi3.T]*goja.Runtime{}
 
 	log.Printf("Loading OpenAPI specs from %s\n", specsDir)
 
@@ -64,6 +66,31 @@ func main() {
 					}
 				}
 			}
+			vm := goja.New()
+			vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+			var randomUUID = func() string {
+				random, err := uuid.NewRandom()
+				if err != nil {
+					panic(err)
+				}
+				return random.String()
+			}
+			if err := vm.Set("randomUUID", randomUUID); err != nil {
+				return err
+			}
+			if err := vm.Set("db", db.Instance); err != nil {
+				return err
+			}
+			script, ok := spec.Extensions["x-sim-script"]
+			if ok {
+				log.Printf("Found x-sim-script: %v", script)
+				_, err := vm.RunString(script.(string))
+				if err != nil {
+					return err
+				}
+			}
+			log.Printf("globals: %v", vm.GlobalObject().Keys())
+			vms[spec] = vm
 		}
 		return nil
 	})
@@ -72,7 +99,7 @@ func main() {
 	}
 
 	for port, specs := range servers {
-		startServer(port, specs)
+		startServer(port, specs, vms)
 	}
 
 	log.Println("Press Ctrl+C to exit")
@@ -80,15 +107,20 @@ func main() {
 	<-ctx.Done()
 }
 
-func startServer(port int, specs []*openapi3.T) {
+var mu = &sync.Mutex{}
+
+func startServer(port int, specs []*openapi3.T, vms map[*openapi3.T]*goja.Runtime) {
 	server := &http.Server{
 		Addr: fmt.Sprintf(":%d", port),
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			mu.Lock()
+			defer mu.Unlock()
 			log.Printf("Request: %s %s", r.Method, r.URL.Path)
 			var op *openapi3.Operation
+			var spec *openapi3.T
 			var pathParams map[string]string
-			for _, s := range specs {
-				router, err := gorillamux.NewRouter(s)
+			for _, spec = range specs {
+				router, err := gorillamux.NewRouter(spec)
 				if err != nil {
 					http.Error(w, fmt.Sprintf("failed to create router: %v", err), http.StatusInternalServerError)
 					return
@@ -105,10 +137,9 @@ func startServer(port int, specs []*openapi3.T) {
 				http.Error(w, "Operation not found in servers", http.StatusNotFound)
 				return
 			}
-			expr, ok := op.Extensions["x-sim-script"]
+			script, ok := op.Extensions["x-sim-script"]
 			if ok {
-				log.Printf("Found x-sim-script: %v", expr)
-
+				log.Printf("Found x-sim-script: %v", script)
 				queryParams := map[string]string{}
 				for key := range r.URL.Query() {
 					queryParams[key] = r.URL.Query().Get(key)
@@ -127,28 +158,12 @@ func startServer(port int, specs []*openapi3.T) {
 					"headers":     headers,
 					"body":        body,
 				}
-				vm := goja.New()
-				vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
+				vm := vms[spec]
 				if err := vm.Set("request", request); err != nil {
 					http.Error(w, fmt.Sprintf("failed to set request: %v", err), http.StatusInternalServerError)
 					return
 				}
-				var randomUUID = func() string {
-					random, err := uuid.NewRandom()
-					if err != nil {
-						panic(err)
-					}
-					return random.String()
-				}
-				if err := vm.Set("randomUUID", randomUUID); err != nil {
-					http.Error(w, fmt.Sprintf("failed to set randomUUID: %v", err), http.StatusInternalServerError)
-					return
-				}
-				if err := vm.Set("db", db.Instance); err != nil {
-					http.Error(w, fmt.Sprintf("failed to set db: %v", err), http.StatusInternalServerError)
-					return
-				}
-				out, err := vm.RunString(expr.(string))
+				out, err := vm.RunString(script.(string))
 				if err != nil {
 					http.Error(w, fmt.Sprintf("failed to run expression: %v", err), http.StatusInternalServerError)
 					return
