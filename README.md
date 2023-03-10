@@ -14,9 +14,8 @@ Sim is straight forward API simulation tools that's tiny and fast secure and sca
 Most of today's API mocking tools run in virtual machines such as the JVM or NPM. Sim is written in Golang and leans on
 standard libraries:
 
-It's orders of magnitude smaller binary and memory usage. Which much lower CPU usage. Each process can simulation
-multiple APIs. Running on Kubernetes? Three pods could simulate every API in your organization with
-high-availability.
+- It's orders of magnitude smaller binary and memory usage. Which much lower CPU usage. Each process can simulation multiple APIs. 
+- Running on Kubernetes? Three pods could simulate every API in your organization with high-availability.
 
 Sim doesn't just mock APIs, it allows you to specify scripts for each API operation and back it with a simple disk
 storage.
@@ -43,11 +42,13 @@ curl -q https://raw.githubusercontent.com/kitproj/sim/main/install.sh | sh
 
 We do not support `go install`.
 
+<!--
 You can run a Docker image:
 
 ```bash
 docker run --rm -ti -v my-directory:/apis kitproj/sim /sim /apis
 ```
+-->
 
 ## Usage
 
