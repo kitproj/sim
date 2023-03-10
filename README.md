@@ -52,7 +52,7 @@ docker run --rm -ti -v my-directory:/apis kitproj/sim /sim /apis
 
 ## Usage
 
-Create a directory containing files named `openapi.yaml`. 
+Create a directory containing files named `*.yaml`. 
 
 Then run:
 
