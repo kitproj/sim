@@ -9,16 +9,15 @@ Make the dev loop crazy fast.
 
 ## What
 
-Sim is straight forward API simulation tools that's tiny and fast secure and scalable.
+Sim is straight-forward API simulation tool that's tiny, fast, secure and scalable.
 
-Most of today's API mocking tools run in virtual machines such as the JVM or NPM. Sim is written in Golang and leans on
-standard libraries:
+Most of today's API mocking tools run in virtual machines such as the JVM or NPM. Sim is a single binary with zero dependencies.
 
 - It's orders of magnitude smaller binary and memory usage. Which much lower CPU usage. Each process can simulation multiple APIs. 
 - Running on Kubernetes? Three pods could simulate every API in your organization with high-availability.
-
-Sim doesn't just mock APIs, it allows you to specify scripts for each API operation and back it with a simple disk
-storage.
+- 
+Sim doesn't just mock APIs, it allows you to specify scripts for each API operation which have access to a simple
+key-value database that allows APIs to save state between requests.
 
 Sim was written with extensive help from AI.
 
@@ -81,7 +80,7 @@ paths:
               example: { "message": "Hello, world!" }
 ```
 
-Or complex scripting
+Scripting
 
 ```yaml
 openapi: 3.0.0
@@ -90,19 +89,95 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:4040
+# This script is executed when the spec is loaded.
+# You can use it to specify global variables and functions that are available to all scripts.
+x-sim-script: |
+  var status = 418
 paths:
   /teapot:
     get:
+      # This script is executed whenever the request is serviced.
+      # The last variable is the response object.
       x-sim-script: |
         response = {
-           "status": 418,
+           "status": status,
            "headers": {
-             "Teapot": request.queryParams.teapot
+             "Teapot": "true"
            },
-           "body": { "message": "I'm a " + db.get("/teapot/name") }
+           "body": { "message": "I'm a teapot" }
          }
       responses:
         '200':
+          description: OK
+```
+
+Scripting with a database:
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Document API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4040
+paths:
+  /documents:
+    post:
+      x-sim-script: |
+        var uuid = randomUUID();
+        db.put("/documents/" + uuid, request.body)
+        response = {
+          "status": 201,
+            "headers": {
+                "Location": "/documents/" + uuid
+            }
+        }
+      responses:
+        '200':
+          description: OK
+    get:
+      x-sim-script: |
+        response = {
+          "body": db.list("/documents")
+        }
+      responses:
+        '200':
+          description: OK
+  /documents/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-sim-script: |
+        var document = db.get("/documents/" + request.pathParams.id);
+        if (document) {
+          response = {
+            "body": document
+          }
+        } else {
+          response = {
+              "status": 404,
+          }
+        }
+      responses:
+        '200':
+          description: OK
+
+    delete:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      x-sim-script: |
+        db.delete("/documents/" + request.pathParams.id)
+        response = {}
+      responses:
+        '204':
           description: OK
 ```
 
@@ -110,9 +185,9 @@ paths:
 
 In you script you have access to the following:
 
-**`request`**
+### `request`
 
-The request, e.g.
+An object containing the HTTP request, e.g.
 
 ```json
 {
@@ -133,19 +208,44 @@ The request, e.g.
 }
 ```
 
-**`randomUuid()`**
+For example:
 
-Generates a random UUID.
+```javascript
+var body = request.body;
+```
 
-**`db`** allows you to persist and access data:
+
+### `randomUuid()`
+
+A function that generates a random UUID. For example:
+
+
+```javascript
+var uuid = randomUUID();
+```
+
+### `db`
+
+A service that allows you to persist and access data:
 
 ```javascript
 // get an object, maybe null
-db.get(key);
-// put an object
-db.put(key, object);
-// delete an object
-db.delete(key)
+var value = db.get(key);
+// put an object (idempotent)
+var existed = db.put(key, value);
+// delete an object (idempotent)
+var deleted = db.delete(key)
 // return an array of all objects
-db.list(keyPrefix);
+var list = db.list(keyPrefix);
+```
+
+For example:
+
+```javascript
+var obj = db.get("/my-api/" + id)
+if (obj) {
+    response = {status: 404}
+} else {
+    response = {body: obj}
+}
 ```

@@ -8,8 +8,8 @@ import (
 // Db is a key-value store
 type Db interface {
 	Get(key string) any
-	Put(key string, value any)
-	Delete(key string)
+	Put(key string, value any) bool
+	Delete(key string) bool
 	List(prefix string) []any
 }
 

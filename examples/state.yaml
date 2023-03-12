@@ -6,7 +6,7 @@ servers:
   - url: http://localhost:4040
 paths:
   /documents:
-    put:
+    post:
       x-sim-script: |
         var uuid = randomUUID();
         db.put("/documents/" + uuid, request.body)
@@ -36,8 +36,15 @@ paths:
           schema:
             type: string
       x-sim-script: |
-        response = {
-          "body": db.get("/documents/" + request.pathParams.id)
+        var document = db.get("/documents/" + request.pathParams.id);
+        if (document) {
+          response = {
+            "body": document
+          }
+        } else {
+          response = {
+              "status": 404,
+          }
         }
       responses:
         '200':
@@ -52,8 +59,7 @@ paths:
             type: string
       x-sim-script: |
         db.delete("/documents/" + request.pathParams.id)
-        response = {
-        }
+        response = {}
       responses:
         '204':
           description: OK
