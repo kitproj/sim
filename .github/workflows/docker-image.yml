@@ -23,7 +23,7 @@ jobs:
         run: docker build . --tag ghcr.io/kitproj/sim:latest
 
       - name: Tag Docker image
-        run: docker tag ghcr.io/kitproj/sim:latest ghcr.io/kitproj/sim:${{ github.ref }}
+        run: docker tag ghcr.io/kitproj/sim:latest ghcr.io/kitproj/sim:${GITHUB_REF#refs/*/}
 
       - name: Push Docker images
         run: docker push -a ghcr.io/kitproj/sim
