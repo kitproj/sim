@@ -5,20 +5,20 @@
 class Sim < Formula
   desc "Straight-forward, fast, scalable API simulation."
   homepage "https://github.com/kitproj/sim"
-  version "0.0.6"
+  version "0.0.7"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.6/sim_0.0.6_Darwin_arm64.tar.gz"
-      sha256 "e3c64f6305df0f67eeba639da2f79abfd44bd054d2108433f52d91987046e230"
+    if Hardware::CPU.intel?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.7/sim_0.0.7_Darwin_x86_64.tar.gz"
+      sha256 "cab6937bd618290e52b874cd056363d0ca25382e63447c9d40c657b416a290f2"
 
       def install
         bin.install "sim"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.6/sim_0.0.6_Darwin_x86_64.tar.gz"
-      sha256 "cdee229b03a53d15425ec2a69515bd548a99bc6c6876f02f405e289a9857e199"
+    if Hardware::CPU.arm?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.7/sim_0.0.7_Darwin_arm64.tar.gz"
+      sha256 "208625738ca25d4f8bbfc259ae80471e0ad07bdc3c66e1e7b1180bd1777931ce"
 
       def install
         bin.install "sim"
@@ -27,17 +27,17 @@ class Sim < Formula
   end
 
   on_linux do
-    if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.6/sim_0.0.6_Linux_x86_64.tar.gz"
-      sha256 "3fd73946c720d3627cdc9d9c11b6681101666a6464695fe438657248e049efc4"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.7/sim_0.0.7_Linux_arm64.tar.gz"
+      sha256 "5ccb1ec32d4e78409900dca80e5c0deafaaf7cc66985efeb3d99b86d5a6eedfd"
 
       def install
         bin.install "sim"
       end
     end
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.6/sim_0.0.6_Linux_arm64.tar.gz"
-      sha256 "06072989b158439e643b6898a6a816756bc5e122b8d16762c2180f02fbcb578b"
+    if Hardware::CPU.intel?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.7/sim_0.0.7_Linux_x86_64.tar.gz"
+      sha256 "efb68dbfc2846c2497840cbba8e56891cad083fea9897a199027f50dc8bb1090"
 
       def install
         bin.install "sim"
