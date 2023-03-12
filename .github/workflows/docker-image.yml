@@ -1,8 +1,6 @@
 name: Publish Docker image
 
 on:
-  release:
-    types: [published]
   push:
     branches:
       - main
@@ -22,6 +20,6 @@ jobs:
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u kitproj --password-stdin
 
       - name: Build and push Docker image
-        run:
+        run: |
           docker build . --tag ghcr.io/kitproj/sim:latest
           docker push ghcr.io/kitproj/sim:latest
