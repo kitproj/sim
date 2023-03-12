@@ -41,13 +41,11 @@ curl -q https://raw.githubusercontent.com/kitproj/sim/main/install.sh | sh
 
 We do not support `go install`.
 
-<!--
-You can run a Docker image:
+As Docker image:
 
 ```bash
-docker run --rm -ti -v my-directory:/apis kitproj/sim /sim /apis
+docker run --rm -ti -v my-directory:/apis ghcr.io/kitproj/sim /sim /apis
 ```
--->
 
 ## Usage
 
