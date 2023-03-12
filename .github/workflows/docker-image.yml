@@ -4,9 +4,6 @@ on:
   release:
     types:
     - published
-  push:
-    branches:
-      - main
 
 permissions:
   packages: write
@@ -26,8 +23,7 @@ jobs:
         run: |
           set -eux
           tag=${{ github.ref }}
-          if [ $tag = main ]; then
-            tag=latest
-          fi
           docker build . --tag ghcr.io/kitproj/sim:$tag
-          docker push ghcr.io/kitproj/sim:$tag
+          docker tag ghcr.io/kitproj/sim:$tag ghcr.io/kitproj/sim:latest 
+          docker push ghcr.io/kitproj/sim:$tag 
+          docker push ghcr.io/kitproj/sim:lastest
