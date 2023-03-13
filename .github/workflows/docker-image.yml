@@ -19,11 +19,11 @@ jobs:
       - name: Log in to Docker Hub
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u kitproj --password-stdin
 
-      - name: Build Docker image
-        run: docker build . --tag ghcr.io/kitproj/sim:latest
+      - name: Create builder instance
+        run: docker buildx create --use
 
-      - name: Tag Docker image
-        run: docker tag ghcr.io/kitproj/sim:latest ghcr.io/kitproj/sim:${GITHUB_REF#refs/*/}
+      - name: Build and push latest Docker image
+        run: docker buildx build --push --platform linux/amd64,linux/arm64 --tag ghcr.io/kitproj/sim:latest .
 
-      - name: Push Docker images
-        run: docker push -a ghcr.io/kitproj/sim
+      - name: Build and push tagged Docker image
+        run: docker buildx build --push --platform linux/amd64,linux/arm64 --tag ghcr.io/kitproj/sim:${GITHUB_REF#refs/*/} .
