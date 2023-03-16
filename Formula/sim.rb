@@ -5,20 +5,20 @@
 class Sim < Formula
   desc "Straight-forward, fast, scalable API simulation."
   homepage "https://github.com/kitproj/sim"
-  version "0.0.12"
+  version "0.0.13"
 
   on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.12/sim_0.0.12_Darwin_arm64.tar.gz"
-      sha256 "d47176805c7bb5aaec598ed72e9e3e890827f24257b7e6e206acef951f7a7764"
+    if Hardware::CPU.intel?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Darwin_x86_64.tar.gz"
+      sha256 "d90826d96f008b1acf0329e2aa6408d817e64dec3e7c81ba17c388c5716f2492"
 
       def install
         bin.install "sim"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.12/sim_0.0.12_Darwin_x86_64.tar.gz"
-      sha256 "f7527e7ed5a7a2a36cb576011b12cd47c2266940aaebfdc3b0140cc8791cfb98"
+    if Hardware::CPU.arm?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Darwin_arm64.tar.gz"
+      sha256 "b937ad8482f9b8948254c8ed80eed3909e4dac65b3d90dbf8f1276ecb48b5a9f"
 
       def install
         bin.install "sim"
@@ -28,16 +28,16 @@ class Sim < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.12/sim_0.0.12_Linux_arm64.tar.gz"
-      sha256 "d9e7a1fdcf7a08dafabf7c44009051a3667a7566e15adf8d4b80fb00c4c092fa"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Linux_arm64.tar.gz"
+      sha256 "0a3d4a55120acc02106896a339151b75b364e3f4be92c0a7e28d1aa8c8f7c740"
 
       def install
         bin.install "sim"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.12/sim_0.0.12_Linux_x86_64.tar.gz"
-      sha256 "08c209b1042e2d064f928570c573731368cd4c5d4b03e6a5c4bb5f3b048943ab"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Linux_x86_64.tar.gz"
+      sha256 "5390700b88f062a2161416671fe888ebaf9c2e5eb6ddb9d7fb6c44030f4967dd"
 
       def install
         bin.install "sim"
