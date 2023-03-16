@@ -13,7 +13,7 @@ import (
 
 func TestSim(t *testing.T) {
 	os.RemoveAll(os.Getenv("HOME") + "/.kitproj/sim/db")
-	os.Args = []string{"examples"}
+	os.Args = []string{"sim", "examples"}
 	go main()
 	time.Sleep(time.Second)
 	t.Run("hello", func(t *testing.T) {
