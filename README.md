@@ -11,13 +11,15 @@ Make the dev loop crazy fast.
 
 Sim is straight-forward API simulation tool that's tiny, fast, secure and scalable.
 
+Sim turns  OpenAPI specs into **executable API specs**. 
+
+Sim doesn't just mock APIs, it allows you to specify scripts for each API operation which have access to a 
+key-value database that allows APIs to save state between requests.
+
 Most of today's API mocking tools run in virtual machines such as the JVM or NPM. Sim is a single binary with zero dependencies.
 
 - It's orders of magnitude smaller binary and memory usage. Which much lower CPU usage. Each process can simulation multiple APIs. 
 - Running on Kubernetes? Three pods could simulate every API in your organization with high-availability.
-- 
-Sim doesn't just mock APIs, it allows you to specify scripts for each API operation which have access to a simple
-key-value database that allows APIs to save state between requests.
 
 Sim was written with extensive help from AI.
 
