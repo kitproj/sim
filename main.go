@@ -128,7 +128,6 @@ func startServer(port int, specs []*openapi3.T, vms map[*openapi3.T]*goja.Runtim
 				var route *routers.Route
 				route, pathParams, err = router.FindRoute(r)
 				if err == nil {
-					log.Printf("Found route: %v", route)
 					op = route.Operation
 					break
 				}
@@ -136,6 +135,21 @@ func startServer(port int, specs []*openapi3.T, vms map[*openapi3.T]*goja.Runtim
 			if op == nil {
 				http.Error(w, "Operation not found in servers", http.StatusNotFound)
 				return
+			}
+			log.Printf("Found operation: %v", op.OperationID)
+			var writeBody = func(value any) error {
+				switch body := value.(type) {
+				case nil:
+					return nil
+				case string:
+					_, err := w.Write([]byte(body))
+					return err
+				case []byte:
+					_, err := w.Write(body)
+					return err
+				default:
+					return json.NewEncoder(w).Encode(body)
+				}
 			}
 			script, ok := op.Extensions["x-sim-script"]
 			if ok {
@@ -181,17 +195,7 @@ func startServer(port int, specs []*openapi3.T, vms map[*openapi3.T]*goja.Runtim
 					w.Header().Set("Content-Type", "application/json")
 				}
 				w.WriteHeader(response.GetStatus())
-
-				switch body := response.GetBody().(type) {
-				case nil:
-				case string:
-					_, err = w.Write([]byte(body))
-				case []byte:
-					_, err = w.Write(body)
-				default:
-					err = json.NewEncoder(w).Encode(response.GetBody())
-				}
-				if err != nil {
+				if err := writeBody(response.GetBody()); err != nil {
 					http.Error(w, fmt.Sprintf("failed to encode response: %v", err), http.StatusInternalServerError)
 					return
 				}
@@ -203,7 +207,9 @@ func startServer(port int, specs []*openapi3.T, vms map[*openapi3.T]*goja.Runtim
 				for mediaType, value := range resp.Value.Content {
 					w.Header().Set("Content-Type", mediaType)
 					w.WriteHeader(status)
-					_ = json.NewEncoder(w).Encode(value.Example)
+					if err := writeBody(value.Example); err != nil {
+						http.Error(w, fmt.Sprintf("failed to encode response: %v", err), http.StatusInternalServerError)
+					}
 					return
 				}
 			}
