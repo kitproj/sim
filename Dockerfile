@@ -17,4 +17,9 @@ COPY --from=build /go/src/github.com/kitproj/sim/sim .
 
 VOLUME [ "/apis" ]
 
+LABEL org.opencontainers.image.title="Sim" \
+      org.opencontainers.image.description="Sim is straight-forward API simulation tool that's tiny, fast, secure and scalable." \
+      org.opencontainers.image.url="https://github.com/kitproj/sim" \
+      org.opencontainers.image.licenses="MIT"
+
 CMD [ "sim" ]
