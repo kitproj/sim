@@ -22,4 +22,4 @@ LABEL org.opencontainers.image.title="Sim" \
       org.opencontainers.image.url="https://github.com/kitproj/sim" \
       org.opencontainers.image.licenses="MIT"
 
-CMD [ "/sim" ]
+CMD [ "/sim", "/apis" ]
