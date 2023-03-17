@@ -5,20 +5,20 @@
 class Sim < Formula
   desc "Straight-forward, fast, scalable API simulation."
   homepage "https://github.com/kitproj/sim"
-  version "0.0.14"
+  version "0.0.15"
 
   on_macos do
-    if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Darwin_x86_64.tar.gz"
-      sha256 "917225e5f0ec1ff78b4f42c0629d5731df406ff45cb27d46ddf3c8783b09f923"
+    if Hardware::CPU.arm?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.15/sim_0.0.15_Darwin_arm64.tar.gz"
+      sha256 "9241d3e5bd135b867287fc94271bc69a28342dd7ee5d265d0fe95d628e571543"
 
       def install
         bin.install "sim"
       end
     end
-    if Hardware::CPU.arm?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Darwin_arm64.tar.gz"
-      sha256 "922ceae3c31f61f27db67f4e4288aaf93bc65d55ccf1eb6a5fe03fa5adaa9a83"
+    if Hardware::CPU.intel?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.15/sim_0.0.15_Darwin_x86_64.tar.gz"
+      sha256 "2960d0ffb138155dedf86c58b8a10165e9bc1fc1c88dc3de7f9f7394dc18e167"
 
       def install
         bin.install "sim"
@@ -27,17 +27,17 @@ class Sim < Formula
   end
 
   on_linux do
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Linux_arm64.tar.gz"
-      sha256 "113e15c5d870bebbf106f48cc14bac48e42593f5a492feaa4136a7a6a24bf74a"
+    if Hardware::CPU.intel?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.15/sim_0.0.15_Linux_x86_64.tar.gz"
+      sha256 "8fe0d304e9bf95b24fbc0995cb82d5dbdb0d90bffa11f61f90c5c3e6362430ff"
 
       def install
         bin.install "sim"
       end
     end
-    if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Linux_x86_64.tar.gz"
-      sha256 "a1faf436be2cb8e3139462c6139657ad59edcbbfd480fefbce95ae72cf02bae3"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/kitproj/sim/releases/download/v0.0.15/sim_0.0.15_Linux_arm64.tar.gz"
+      sha256 "a1c3d167cb92c164e74fdabe08e3c4310d2b6a27a6c8ee4a058fe209a46401e6"
 
       def install
         bin.install "sim"
