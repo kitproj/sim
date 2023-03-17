@@ -5,20 +5,20 @@
 class Sim < Formula
   desc "Straight-forward, fast, scalable API simulation."
   homepage "https://github.com/kitproj/sim"
-  version "0.0.13"
+  version "0.0.14"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Darwin_x86_64.tar.gz"
-      sha256 "d90826d96f008b1acf0329e2aa6408d817e64dec3e7c81ba17c388c5716f2492"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Darwin_x86_64.tar.gz"
+      sha256 "917225e5f0ec1ff78b4f42c0629d5731df406ff45cb27d46ddf3c8783b09f923"
 
       def install
         bin.install "sim"
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Darwin_arm64.tar.gz"
-      sha256 "b937ad8482f9b8948254c8ed80eed3909e4dac65b3d90dbf8f1276ecb48b5a9f"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Darwin_arm64.tar.gz"
+      sha256 "922ceae3c31f61f27db67f4e4288aaf93bc65d55ccf1eb6a5fe03fa5adaa9a83"
 
       def install
         bin.install "sim"
@@ -28,16 +28,16 @@ class Sim < Formula
 
   on_linux do
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Linux_arm64.tar.gz"
-      sha256 "0a3d4a55120acc02106896a339151b75b364e3f4be92c0a7e28d1aa8c8f7c740"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Linux_arm64.tar.gz"
+      sha256 "113e15c5d870bebbf106f48cc14bac48e42593f5a492feaa4136a7a6a24bf74a"
 
       def install
         bin.install "sim"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/kitproj/sim/releases/download/v0.0.13/sim_0.0.13_Linux_x86_64.tar.gz"
-      sha256 "5390700b88f062a2161416671fe888ebaf9c2e5eb6ddb9d7fb6c44030f4967dd"
+      url "https://github.com/kitproj/sim/releases/download/v0.0.14/sim_0.0.14_Linux_x86_64.tar.gz"
+      sha256 "a1faf436be2cb8e3139462c6139657ad59edcbbfd480fefbce95ae72cf02bae3"
 
       def install
         bin.install "sim"
