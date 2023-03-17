@@ -16,6 +16,10 @@ import (
 	"github.com/getkin/kin-openapi/routers"
 )
 
+func init() {
+	log.SetOutput(os.Stdout)
+}
+
 func main() {
 	// Parse command-line flags
 	if len(os.Args) <= 1 {
