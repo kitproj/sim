@@ -15,4 +15,6 @@ FROM scratch as sim
 
 COPY --from=build /go/src/github.com/kitproj/sim/sim .
 
+VOLUME [ "/apis" ]
+
 CMD [ "sim" ]

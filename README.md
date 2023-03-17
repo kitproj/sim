@@ -46,7 +46,7 @@ We do not support `go install`.
 As Docker image:
 
 ```bash
-docker run --rm -ti -v examples:/apis ghcr.io/kitproj/sim /sim /apis
+docker run --rm -ti -v examples:/apis ghcr.io/kitproj/sim
 ```
 
 ## Usage
@@ -56,7 +56,7 @@ Create a directory containing files named `*.yaml`.
 Then run:
 
 ```bash
-sim my-directory
+sim apis
 
 ```
 
