@@ -1,3 +1,4 @@
+#!/usr/bin/env sim
 openapi: 3.0.0
 info:
   title: Hello API 2

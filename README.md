@@ -181,6 +181,16 @@ paths:
           description: OK
 ```
 
+## Executable Specs
+
+You can make you spec an executable program, add the following line:
+
+```yaml
+#!/usr/bin/env sim
+```
+
+Make your YAML executable with `chmod +x`.
+
 ## Reference
 
 In you script you have access to the following:

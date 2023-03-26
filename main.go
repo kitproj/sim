@@ -48,15 +48,25 @@ func main() {
 		if err := watcher.Add(path); err != nil {
 			log.Fatalf("Error watching directory: %s\n", err)
 		}
-		dir, err := os.ReadDir(path)
+		stat, err := os.Stat(path)
 		if err != nil {
-			log.Fatalf("Error reading directory: %s\n", err)
+			log.Fatal(err)
 		}
-		for _, file := range dir {
-			if filepath.Ext(file.Name()) != ".yaml" {
-				continue
+		if stat.IsDir() {
+			dir, err := os.ReadDir(path)
+			if err != nil {
+				log.Fatalf("Error reading directory: %s\n", err)
 			}
-			if err := sim.add(filepath.Join(path, file.Name())); err != nil {
+			for _, file := range dir {
+				if filepath.Ext(file.Name()) != ".yaml" {
+					continue
+				}
+				if err := sim.add(filepath.Join(path, file.Name())); err != nil {
+					log.Fatalf("Error adding spec: %s\n", err)
+				}
+			}
+		} else {
+			if err := sim.add(path); err != nil {
 				log.Fatalf("Error adding spec: %s\n", err)
 			}
 		}
