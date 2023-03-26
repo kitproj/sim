@@ -60,6 +60,8 @@ sim apis
 
 ```
 
+### Mocking 
+
 Simulations are described by their API specification. For simple mocking, specify your examples in the OpenAPI spec:
 
 ```yaml
@@ -80,7 +82,7 @@ paths:
               example: { "message": "Hello, world!" }
 ```
 
-Scripting
+### Scripting
 
 ```yaml
 openapi: 3.0.0
@@ -111,7 +113,7 @@ paths:
           description: OK
 ```
 
-Scripting with a database:
+### Scripting With A Database
 
 ```yaml
 openapi: 3.0.0
@@ -178,6 +180,35 @@ paths:
         response = {}
       responses:
         '204':
+          description: OK
+```
+
+### Scripting With HTTP Requests
+
+A script can make a HTTP request:
+
+```yaml
+#!/usr/bin/env sim
+openapi: 3.0.0
+info:
+  title: Proxy API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5050
+paths:
+  /proxy:
+    get:
+      x-sim-script: |
+        hello = http({"url": "http://localhost:8080/hello"})
+        response = {
+           "status": hello["status"],
+           "headers": {
+             "Proxy": "true"
+           },
+           "body": hello.body
+         }
+      responses:
+        '200':
           description: OK
 ```
 
