@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/json"
@@ -12,7 +12,6 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/routers"
 	"github.com/getkin/kin-openapi/routers/gorillamux"
-	"github.com/google/uuid"
 	"github.com/kitproj/sim/internal/db"
 )
 
@@ -23,7 +22,16 @@ type Sim struct {
 	routers map[*openapi3.T]routers.Router
 }
 
-func (s *Sim) add(path string) error {
+func NewSim() *Sim {
+	return &Sim{
+		servers: make(map[int]*http.Server),
+		specs:   make(map[string]*openapi3.T),
+		vms:     make(map[*openapi3.T]*goja.Runtime),
+		routers: make(map[*openapi3.T]routers.Router),
+	}
+}
+
+func (s *Sim) Add(path string) error {
 	spec, err := openapi3.NewLoader().LoadFromFile(path)
 	if err != nil {
 		return err
@@ -53,20 +61,18 @@ func (s *Sim) add(path string) error {
 			return err
 		}
 		s.routers[spec] = router
-
 		vm := goja.New()
 		vm.SetFieldNameMapper(goja.TagFieldNameMapper("json", true))
-		var randomUUID = func() string {
-			random, err := uuid.NewRandom()
-			if err != nil {
-				panic(err)
-			}
-			return random.String()
-		}
 		if err := vm.Set("randomUUID", randomUUID); err != nil {
 			return err
 		}
+		if err := vm.Set("http", httpService); err != nil {
+			return err
+		}
 		if err := vm.Set("db", db.Instance); err != nil {
+			return err
+		}
+		if err := vm.Set("console", console); err != nil {
 			return err
 		}
 		script, ok := spec.Extensions["x-sim-script"]
@@ -101,8 +107,6 @@ func (s *Sim) add(path string) error {
 }
 
 func (s *Sim) Handle(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
 	log.Printf("Request: %s %s", r.Method, r.URL.Path)
 	log.Printf("Request URL: %v", r.Host)
 	spec, route, pathParams, err := s.find(r)
@@ -112,20 +116,6 @@ func (s *Sim) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 	op := route.Operation
 	log.Printf("Found operation: %v", op.OperationID)
-	var writeBody = func(value any) error {
-		switch body := value.(type) {
-		case nil:
-			return nil
-		case string:
-			_, err := w.Write([]byte(body))
-			return err
-		case []byte:
-			_, err := w.Write(body)
-			return err
-		default:
-			return json.NewEncoder(w).Encode(body)
-		}
-	}
 	script, ok := op.Extensions["x-sim-script"]
 	if ok {
 		log.Printf("Found x-sim-script: %v", script)
@@ -149,7 +139,6 @@ func (s *Sim) Handle(w http.ResponseWriter, r *http.Request) {
 		}
 		vm := s.vms[spec]
 		log.Printf("globals: %v", vm.GlobalObject().Keys())
-
 		if err := vm.Set("request", request); err != nil {
 			http.Error(w, fmt.Sprintf("failed to set request: %v", err), http.StatusInternalServerError)
 			return
@@ -172,7 +161,7 @@ func (s *Sim) Handle(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 		}
 		w.WriteHeader(response.GetStatus())
-		if err := writeBody(response.GetBody()); err != nil {
+		if err := writeBody(w, response.GetBody()); err != nil {
 			http.Error(w, fmt.Sprintf("failed to encode response: %v", err), http.StatusInternalServerError)
 			return
 		}
@@ -184,7 +173,7 @@ func (s *Sim) Handle(w http.ResponseWriter, r *http.Request) {
 		for mediaType, value := range resp.Value.Content {
 			w.Header().Set("Content-Type", mediaType)
 			w.WriteHeader(status)
-			if err := writeBody(value.Example); err != nil {
+			if err := writeBody(w, value.Example); err != nil {
 				http.Error(w, fmt.Sprintf("failed to encode response: %v", err), http.StatusInternalServerError)
 			}
 			return

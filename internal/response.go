@@ -1,16 +1,11 @@
-package main
+package internal
 
-import (
-	"fmt"
-)
-
-type Request map[string]any
+import "fmt"
 
 type Response map[string]any
 
 func (r Response) GetStatus() int {
-	v, ok := r["status"].(int64)
-	if ok {
+	if v, ok := r["status"].(int64); ok {
 		return int(v)
 	}
 	if r.GetBody() != nil {

@@ -1,0 +1,22 @@
+#!/usr/bin/env sim
+openapi: 3.0.0
+info:
+  title: Proxy API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5050
+paths:
+  /proxy:
+    get:
+      x-sim-script: |
+        hello = http({"url": "http://localhost:8080/hello"})
+        response = {
+           "status": hello["status"],
+           "headers": {
+             "Proxy": "true"
+           },
+           "body": hello.body
+         }
+      responses:
+        '200':
+          description: OK

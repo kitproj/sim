@@ -61,4 +61,10 @@ func TestSim(t *testing.T) {
 			assert.Equal(t, 204, resp.StatusCode)
 		})
 	})
+	t.Run("proxy", func(t *testing.T) {
+		resp, err := http.Get("http://localhost:5050/proxy")
+		assert.NoError(t, err)
+		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(t, "true", resp.Header.Get("Proxy"))
+	})
 }

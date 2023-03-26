@@ -3,17 +3,14 @@ package main
 import (
 	"context"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"sync"
 	"syscall"
 
-	"github.com/dop251/goja"
+	"github.com/kitproj/sim/internal"
+
 	"github.com/fsnotify/fsnotify"
-	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/getkin/kin-openapi/routers"
 )
 
 func init() {
@@ -30,12 +27,7 @@ func main() {
 	defer stop()
 
 	// Find OpenAPI spec files in directory
-	sim := &Sim{
-		servers: make(map[int]*http.Server),
-		specs:   make(map[string]*openapi3.T),
-		vms:     make(map[*openapi3.T]*goja.Runtime),
-		routers: make(map[*openapi3.T]routers.Router),
-	}
+	sim := internal.NewSim()
 
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -61,12 +53,12 @@ func main() {
 				if filepath.Ext(file.Name()) != ".yaml" {
 					continue
 				}
-				if err := sim.add(filepath.Join(path, file.Name())); err != nil {
+				if err := sim.Add(filepath.Join(path, file.Name())); err != nil {
 					log.Fatalf("Error adding spec: %s\n", err)
 				}
 			}
 		} else {
-			if err := sim.add(path); err != nil {
+			if err := sim.Add(path); err != nil {
 				log.Fatalf("Error adding spec: %s\n", err)
 			}
 		}
@@ -81,12 +73,10 @@ func main() {
 		case event := <-watcher.Events:
 			log.Println("event:", event)
 			if filepath.Ext(event.Name) == ".yaml" && (event.Has(fsnotify.Write) || event.Has(fsnotify.Create)) {
-				if err := sim.add(event.Name); err != nil {
+				if err := sim.Add(event.Name); err != nil {
 					log.Printf("Error adding spec: %s\n", err)
 				}
 			}
 		}
 	}
 }
-
-var mu = &sync.Mutex{}
