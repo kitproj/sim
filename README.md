@@ -5,7 +5,7 @@
 
 ## Why
 
-Make the dev loop crazy fast.
+Makes API simulation easy and fast.
 
 ## What
 
